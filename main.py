@@ -89,12 +89,13 @@ ghost_img4 = pygame.image.load('ghost_4.png')
 ghost_img_list.append(ghost_img4)
 ghost_img5 = pygame.image.load('ghost_5.png')
 ghost_img_list.append(ghost_img5)
+
 for i in range(0, len(maze)):
     for j in range(0, len(maze[0])):
         if maze[i][j] == 2:
             ghost_list.append((i, j))
         if maze[i][j] == 3:
-            goal = (i,j)
+            goal = (i, j)
 
 # wall block
 
@@ -103,46 +104,49 @@ block_img1 = pygame.image.load('wall2.png')
 block_corner_img = pygame.image.load('wall1.png')
 
 
-# movement
-def left_move():
-    global x, y, player_img
-    if keys[pygame.K_LEFT] and maze[y // 20][(x - 20) // 20] != 1 and maze[y // 20][(x - 20) // 20] != 2:
-        x -= 20
-        maze[y // 20][x // 20] = 0
-        player_img = player_img180
-        return True
-    return False
+# movement with keyboard ( not use)
+# def left_move():
+#     global x, y, player_img
+#     if keys[pygame.K_LEFT] and maze[y // 20][(x - 20) // 20] != 1 and maze[y // 20][(x - 20) // 20] != 2:
+#         x -= 20
+#         maze[y // 20][x // 20] = 0
+#         player_img = player_img180
+#         return True
+#     return False
+#
+#
+# def right_move():
+#     global x, y, player_img
+#     if keys[pygame.K_RIGHT] and maze[y // 20][(x + 20) // 20] != 1 and maze[y // 20][(x + 20) // 20] != 2:
+#         x += 20
+#         maze[y // 20][x // 20] = 0
+#         player_img = player_img0
+#         return True
+#     return False
+#
+#
+# def up_move():
+#     global x, y, player_img
+#     if keys[pygame.K_UP] and maze[(y - 20) // 20][x // 20] != 1 and maze[(y - 20) // 20][x // 20] != 2:
+#         y -= 20
+#         maze[y // 20][x // 20] = 0
+#         player_img = player_img90
+#         return True
+#     return False
+#
+#
+# def down_move():
+#     global x, y, player_img
+#     if keys[pygame.K_DOWN] and maze[(y + 20) // 20][x // 20] != 1 and maze[(y + 20) // 20][x // 20] != 2:
+#         y += 20
+#         maze[y // 20][x // 20] = 0
+#         player_img = player_img270
+#         return True
+#     return False
 
 
-def right_move():
-    global x, y, player_img
-    if keys[pygame.K_RIGHT] and maze[y // 20][(x + 20) // 20] != 1 and maze[y // 20][(x + 20) // 20] != 2:
-        x += 20
-        maze[y // 20][x // 20] = 0
-        player_img = player_img0
-        return True
-    return False
 
-
-def up_move():
-    global x, y, player_img
-    if keys[pygame.K_UP] and maze[(y - 20) // 20][x // 20] != 1 and maze[(y - 20) // 20][x // 20] != 2:
-        y -= 20
-        maze[y // 20][x // 20] = 0
-        player_img = player_img90
-        return True
-    return False
-
-
-def down_move():
-    global x, y, player_img
-    if keys[pygame.K_DOWN] and maze[(y + 20) // 20][x // 20] != 1 and maze[(y + 20) // 20][x // 20] != 2:
-        y += 20
-        maze[y // 20][x // 20] = 0
-        player_img = player_img270
-        return True
-    return False
-
+#movement with oder
 def move_animation(command):
     global x, y, player_img
     time.sleep(0.5)
