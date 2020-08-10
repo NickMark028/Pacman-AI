@@ -1,4 +1,5 @@
 import pygame
+import sys
 import os
 import numpy as np
 import random
@@ -92,9 +93,9 @@ ghost_img_list.append(ghost_img5)
 
 for i in range(0, len(maze)):
     for j in range(0, len(maze[0])):
-        if maze[i][j] == 2:
-            ghost_list.append((i, j))
         if maze[i][j] == 3:
+            ghost_list.append((i, j))
+        if maze[i][j] == 2:
             goal = (i, j)
 
 # wall block
@@ -148,21 +149,21 @@ block_corner_img = pygame.image.load('wall1.png')
 
 #movement with oder
 def move_animation(command):
-    global x, y, player_img
+    global x, y, player_img, maze
     time.sleep(0.5)
-    if command == 'LEFT' and maze[y // 20][(x - 20) // 20] != 1 and maze[y // 20][(x - 20) // 20] != 2:
+    if command == 'LEFT' and maze[y // 20][(x - 20) // 20] != 1 and maze[y // 20][(x - 20) // 20] != 3:
         x -= 20
         maze[y // 20][x // 20] = 0
         player_img = player_img180
-    if command == 'RIGHT' and maze[y // 20][(x + 20) // 20] != 1 and maze[y // 20][(x + 20) // 20] != 2:
+    if command == 'RIGHT' and maze[y // 20][(x + 20) // 20] != 1 and maze[y // 20][(x + 20) // 20] != 3:
         x += 20
         maze[y // 20][x // 20] = 0
         player_img = player_img0
-    if command == 'UP' and maze[(y - 20) // 20][x // 20] != 1 and maze[(y - 20) // 20][x // 20] != 2:
+    if command == 'UP' and maze[(y - 20) // 20][x // 20] != 1 and maze[(y - 20) // 20][x // 20] != 3:
         y -= 20
         maze[y // 20][x // 20] = 0
         player_img = player_img90
-    if command == 'DOWN' and maze[(y + 20) // 20][x // 20] != 1 and maze[(y + 20) // 20][x // 20] != 2:
+    if command == 'DOWN' and maze[(y + 20) // 20][x // 20] != 1 and maze[(y + 20) // 20][x // 20] != 3:
         y += 20
         maze[y // 20][x // 20] = 0
         player_img = player_img270
@@ -173,6 +174,7 @@ def BFS(mtx, start, goal):
     expanded = []
     parent_list = []
     flag = np.zeros((len(maze), len(maze[0])))
+
     while (frontier[0] != goal):
         node = frontier.pop(0)
         flag[node[0]][node[1]] = 1
@@ -200,8 +202,7 @@ def BFS(mtx, start, goal):
     path = list(reversed(temp_path))
     path.append(goal)
     movement = []
-
-    for i in range(0, len(path) - 1):
+    for i in range(0, len(path)-1):
         if (path[i][0] - 1, path[i][1]) == (path[i + 1][0], path[i + 1][1]):
             movement.append('UP')
         if (path[i][0] + 1, path[i][1]) == (path[i + 1][0], path[i + 1][1]):
@@ -210,7 +211,7 @@ def BFS(mtx, start, goal):
             movement.append('LEFT')
         if (path[i][0], path[i][1] + 1) == (path[i + 1][0], path[i + 1][1]):
             movement.append('RIGHT')
-    print(movement)
+
     return movement
 
 
@@ -223,24 +224,34 @@ cmd = BFS(maze, (pacman_i, pacman_j), goal)
 while running:
     screen.fill((0, 0, 0))
 
+
     for i in range(0, len(maze)):
         for j in range(0, len(maze[0])):
-            if maze[i][j] == 3:
+            if maze[i][j] == 2:
                 generate_object(food_img, j * 20, i * 20)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     #     keys = pygame.key.get_pressed()
-    print(cmd[t])
-    move_animation(cmd[t])
-    generate_object(player_img, x, y)
-    t += 1
+    # if t == len(cmd):
+    #     print('?')
+    #     sys.exit()
+
+
     for i in range(0, len(ghost_list)):
         generate_object(ghost_img_list[i % 5], ghost_list[i][1] * 20, ghost_list[i][0] * 20)
     for i in range(0, len(maze)):
         for j in range(0, len(maze[0])):
             if maze[i][j] == 1:
                 generate_object(block_img, j * 20, i * 20)
-
+    generate_object(player_img, x, y)
+    time.sleep(0.2)
+    if t == len(cmd):
+        time.sleep(0.5)
+        pygame.display.update()
+        break
+    move_animation(cmd[t])
+    t += 1
     pygame.display.update()
+
