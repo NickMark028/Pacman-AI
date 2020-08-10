@@ -33,7 +33,7 @@ def import_maze(filename):
     return (n, m, maze, pacman_i, pacman_j)
 
 
-(n, m, maze, pacman_i, pacman_j) = import_maze('Maps\\Level_3\\Map_3_1.txt')
+(n, m, maze, pacman_i, pacman_j) = import_maze('Maps\\Level_2\\Map_2_1.txt')
 
 # create screen
 
@@ -180,16 +180,16 @@ def BFS(mtx, start, goal):
         flag[node[0]][node[1]] = 1
         expanded.append(node)
 
-        if (flag[node[0] - 1][node[1]] != 1 and (node[0] - 1, node[1]) not in frontier and mtx[node[0] - 1][node[1]] != 1):
+        if (flag[node[0] - 1][node[1]] != 1 and (node[0] - 1, node[1]) not in frontier and mtx[node[0] - 1][node[1]] != 1 and mtx[node[0] - 1][node[1]] != 3):
             parent_list.append(((node[0] - 1, node[1]), node))
             frontier.append((node[0] - 1, node[1]))
-        if (flag[node[0] + 1][node[1]] != 1 and (node[0] + 1, node[1]) not in frontier and mtx[node[0] + 1][node[1]] != 1):
+        if (flag[node[0] + 1][node[1]] != 1 and (node[0] + 1, node[1]) not in frontier and mtx[node[0] + 1][node[1]] != 1 and mtx[node[0] + 1][node[1]] != 3):
             parent_list.append(((node[0] + 1, node[1]), node))
             frontier.append((node[0] + 1, node[1]))
-        if (flag[node[0]][node[1] - 1] != 1 and (node[0], node[1] - 1) not in frontier and mtx[node[0]][node[1] - 1] != 1):
+        if (flag[node[0]][node[1] - 1] != 1 and (node[0], node[1] - 1) not in frontier and mtx[node[0]][node[1] - 1] != 1 and mtx[node[0]][node[1] - 1] != 3):
             parent_list.append(((node[0], node[1] - 1), node))
             frontier.append((node[0], node[1] - 1))
-        if (flag[node[0]][node[1] + 1] != 1 and (node[0], node[1] + 1) not in frontier and mtx[node[0]][node[1] + 1] != 1):
+        if (flag[node[0]][node[1] + 1] != 1 and (node[0], node[1] + 1) not in frontier and mtx[node[0]][node[1] + 1] != 1 and mtx[node[0]][node[1] + 1] != 3):
             parent_list.append(((node[0], node[1] + 1), node))
             frontier.append((node[0], node[1] + 1))
     expanded.append(goal)
@@ -201,6 +201,7 @@ def BFS(mtx, start, goal):
             temp_path.append(temp_parent)
     path = list(reversed(temp_path))
     path.append(goal)
+    print(path)
     movement = []
     for i in range(0, len(path)-1):
         if (path[i][0] - 1, path[i][1]) == (path[i + 1][0], path[i + 1][1]):
@@ -211,7 +212,7 @@ def BFS(mtx, start, goal):
             movement.append('LEFT')
         if (path[i][0], path[i][1] + 1) == (path[i + 1][0], path[i + 1][1]):
             movement.append('RIGHT')
-
+    print(movement)
     return movement
 
 
