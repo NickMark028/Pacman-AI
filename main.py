@@ -4,14 +4,15 @@ import os
 import numpy as np
 import random
 import time
+
 pygame.init()
 
 
 # Import a maze from file name
 # Return (n, m, 2D_array_maze, pacman_i, pacman_j)
 def import_maze(filename):
-    if (not os.path.exists(filename)):
-        return (0, 0, None)
+    if not os.path.exists(filename):
+        return 0, 0, None, 0, 0
 
     file = open(filename, 'r')
 
@@ -30,8 +31,10 @@ def import_maze(filename):
 
     file.close()
 
-    return (n, m, maze, pacman_i, pacman_j)
+    return n, m, maze, pacman_i, pacman_j
 
+
+# Load map
 
 (n, m, maze, pacman_i, pacman_j) = import_maze('Maps\\Level_2\\Map_2_1.txt')
 
@@ -39,7 +42,7 @@ def import_maze(filename):
 
 screen = pygame.display.set_mode((len(maze[0]) * 20, len(maze) * 20))
 
-# change tilte and logo
+# change title and logo
 
 pygame.display.set_caption("Pacman")
 logo = pygame.image.load('pacmanicon.png')
@@ -146,8 +149,9 @@ block_corner_img = pygame.image.load('wall1.png')
 #     return False
 
 
+# movement with oder
 
-#movement with oder
+# Move player
 def move_animation(command):
     global x, y, player_img, maze
     time.sleep(0.5)
@@ -168,6 +172,7 @@ def move_animation(command):
         maze[y // 20][x // 20] = 0
         player_img = player_img270
 
+
 # BFS for lv 1-2
 def BFS(mtx, start, goal):
     frontier = [start]
@@ -180,16 +185,20 @@ def BFS(mtx, start, goal):
         flag[node[0]][node[1]] = 1
         expanded.append(node)
 
-        if (flag[node[0] - 1][node[1]] != 1 and (node[0] - 1, node[1]) not in frontier and mtx[node[0] - 1][node[1]] != 1 and mtx[node[0] - 1][node[1]] != 3):
+        if (flag[node[0] - 1][node[1]] != 1 and (node[0] - 1, node[1]) not in frontier and mtx[node[0] - 1][
+            node[1]] != 1 and mtx[node[0] - 1][node[1]] != 3):
             parent_list.append(((node[0] - 1, node[1]), node))
             frontier.append((node[0] - 1, node[1]))
-        if (flag[node[0] + 1][node[1]] != 1 and (node[0] + 1, node[1]) not in frontier and mtx[node[0] + 1][node[1]] != 1 and mtx[node[0] + 1][node[1]] != 3):
+        if (flag[node[0] + 1][node[1]] != 1 and (node[0] + 1, node[1]) not in frontier and mtx[node[0] + 1][
+            node[1]] != 1 and mtx[node[0] + 1][node[1]] != 3):
             parent_list.append(((node[0] + 1, node[1]), node))
             frontier.append((node[0] + 1, node[1]))
-        if (flag[node[0]][node[1] - 1] != 1 and (node[0], node[1] - 1) not in frontier and mtx[node[0]][node[1] - 1] != 1 and mtx[node[0]][node[1] - 1] != 3):
+        if (flag[node[0]][node[1] - 1] != 1 and (node[0], node[1] - 1) not in frontier and mtx[node[0]][
+            node[1] - 1] != 1 and mtx[node[0]][node[1] - 1] != 3):
             parent_list.append(((node[0], node[1] - 1), node))
             frontier.append((node[0], node[1] - 1))
-        if (flag[node[0]][node[1] + 1] != 1 and (node[0], node[1] + 1) not in frontier and mtx[node[0]][node[1] + 1] != 1 and mtx[node[0]][node[1] + 1] != 3):
+        if (flag[node[0]][node[1] + 1] != 1 and (node[0], node[1] + 1) not in frontier and mtx[node[0]][
+            node[1] + 1] != 1 and mtx[node[0]][node[1] + 1] != 3):
             parent_list.append(((node[0], node[1] + 1), node))
             frontier.append((node[0], node[1] + 1))
     expanded.append(goal)
@@ -203,7 +212,7 @@ def BFS(mtx, start, goal):
     path.append(goal)
     print(path)
     movement = []
-    for i in range(0, len(path)-1):
+    for i in range(0, len(path) - 1):
         if (path[i][0] - 1, path[i][1]) == (path[i + 1][0], path[i + 1][1]):
             movement.append('UP')
         if (path[i][0] + 1, path[i][1]) == (path[i + 1][0], path[i + 1][1]):
@@ -225,7 +234,7 @@ cmd = BFS(maze, (pacman_i, pacman_j), goal)
 while running:
     screen.fill((0, 0, 0))
 
-
+    # Food
     for i in range(0, len(maze)):
         for j in range(0, len(maze[0])):
             if maze[i][j] == 2:
@@ -239,14 +248,19 @@ while running:
     #     print('?')
     #     sys.exit()
 
-
+    # Ghost
     for i in range(0, len(ghost_list)):
         generate_object(ghost_img_list[i % 5], ghost_list[i][1] * 20, ghost_list[i][0] * 20)
+
+    # Wall
     for i in range(0, len(maze)):
         for j in range(0, len(maze[0])):
             if maze[i][j] == 1:
                 generate_object(block_img, j * 20, i * 20)
+
+    # Player
     generate_object(player_img, x, y)
+
     time.sleep(0.2)
     if t == len(cmd):
         time.sleep(0.5)
@@ -255,4 +269,5 @@ while running:
     move_animation(cmd[t])
     t += 1
     pygame.display.update()
+
 
