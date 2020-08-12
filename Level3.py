@@ -7,14 +7,22 @@ def between(value, left, right):
     return left <= value <= right
 
 
-class ObjectID(Enum):
-    air = 0
-    wall = 1
-    point = 2
-    ghost = 3
-
-
 class Lv3:
+    class ObjectID(Enum):
+        air = 0
+        wall = 1
+        point = 2
+        ghost = 3
+
+    class Pacman:
+        def __init__(self, row, column, maze):
+            self.maze = maze
+            self.row_start = row
+            self.column_start = column
+
+        def move(self):
+            pass
+
     class Ghost:
         def __init__(self, row, column, maze):
             # Initialize
@@ -35,6 +43,7 @@ class Lv3:
                     self.maze[next_row, next_column] != ObjectID.wall\
                     ):
                     self.next_direction_list.append(direction)
+
         def move_random(self):
             if self.direction_index == -1:
                 self.direction_index = random(len(self.next_direction_list))
@@ -49,15 +58,14 @@ class Lv3:
                 self.direction_index = -1
                 return {'RIGHT': 'LEFT', 'UP': 'DOWN', 'LEFT': 'RIGHT', 'DOWN': 'UP'}[direction[2]]
 
-    def __init__(self, maze, ghosts):
+    def __init__(self, maze, pacman_position, ghosts):
         self.maze = maze
-        self.ghost_initial_positions = ghosts
-        self.flags = -np.ones((len(maze), len(maze[0]), dtype = int)
+        self.pacman = Pacman(pacman_position[0], pacman_position[1], self.maze)
+        self.ghosts = [Ghost(ghost[0], ghost[1], self.maze) for ghost in ghosts]
 
-        pass
     def update(self):
-
-
-        pass
+        self.pacman.move()
+        for ghost in self.ghosts:
+            ghost.move_random()
 
 
