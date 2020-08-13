@@ -1,8 +1,8 @@
 import queue
 class Lv4:
     def __init__(self, maze, Wall, Ghost, Food, Pacman):
-        self.maze_pacman = [[-1 for _ in len(maze[0])] for _ in len(maze)]
-        self.maze_time = [[0 for _ in len(maze[0])] for _ in len(maze)]
+        self.maze_pacman = [[(-1) for _ in range(len(maze[0]))] for _ in range(len(maze))]
+        self.maze_time = [[0 for _ in range(len(maze[0]))] for _ in range(len(maze))]
         self.time_count = 0
         self.wall = Wall
         self.ghost = Ghost
@@ -15,6 +15,8 @@ class Lv4:
         self.pacman = Pacman
 
     def FindPathForEachGhost(self, ghost, target, maze):
+        if ghost == target:
+            return target
         height, width = len(maze), len(maze[0])
         frontier = queue.Queue()
         frontier.put(ghost)
@@ -23,7 +25,7 @@ class Lv4:
         parent[ghost[0]][ghost[1]] = 0
 
         while not frontier.empty():
-            current_node = frontier.put()
+            current_node = frontier.get()
 
             for i in range(4):
                 next_node = (current_node[0] + self.direction[i][0], current_node[1] + self.direction[i][1])
@@ -44,21 +46,21 @@ class Lv4:
     def FindPathForGhosts(self, maze, ghost_list):
         #height, width = len(maze), len(maze[0])
         adjacent_Pacman = [self.pacman for _ in range(5)]
-        move = ["RIGHT" for _ in range(len(ghost_list))]
+        move = ['RIGHT' for _ in range(len(ghost_list))]
         for i in range(4):
             adjacent_Pacman[i] = (self.pacman[0] + self.direction[i][0], self.pacman[1] + self.direction[i][1])
         for i in range(len(ghost_list)):
             target = adjacent_Pacman[i % 4]
             if ghost_list[i][0] == target or maze[target[0]][target[1]] == self.wall:
                 target = self.pacman
-            next_move = FindPathForEachGhost(ghost_list[i], target, maze)
+            next_move = self.FindPathForEachGhost(ghost_list[i], target, maze)
             
             if next_move[0] - 1 == ghost_list[i][0]:
-                move[i] = "DOWN"
+                move[i] = 'DOWN'
             elif next_move[0] + 1 == ghost_list[i][0]:
-                move[i] = "UP"
-            elif next_move[1] - 1 == ghost_list[i][1]:
-                move[i] = "LEFT"
+                move[i] = 'UP'
+            elif next_move[1] + 1 == ghost_list[i][1]:
+                move[i] = 'LEFT'
         
         return move
 
@@ -91,7 +93,7 @@ class Lv4:
                     cell = self.See(next_node[0], next_node[1], maze)
                     if cell == self.ghost:
                         ghost_list.append(next_node)
-                    if cell != self.wall
+                    if cell != self.wall:
                         q.put(next_node)
                         visited.append(next_node)
                         count[1] += 1
@@ -131,9 +133,9 @@ class Lv4:
         if distance_food == 10 ** 15:
             distance_food = 0
         if distance_explored == 10 ** 15:
-            distance_explored = 0`
+            distance_explored = 0
         
-        return self.point_for_food * distance_food + self.point_for_exploring * distance_explored + self.time_count[x][y]
+        return int(self.point_for_food * distance_food + self.point_for_exploring * distance_explored + self.maze_time[x][y])
 
     def PredictPathofGhost(self, ghost_list, maze):
         possible_way = [ghost_list]
@@ -158,16 +160,16 @@ class Lv4:
     
 
     def CalPointForPredictivePath(self,x, y, predictive_path, maze, step):
-        point = 0
+        point, min_point = 0, 0
         
         cell = self.See(x, y, maze)
         if (x, y) in predictive_path[step] or (x, y) in predictive_path[step + 1]:
             point += self.point_for_impact_ghost[step] 
-        if cell = self.food:
+        if cell == self.food:
             point += self.point_for_eating_food[step]
             self.maze_pacman[x][y] = 0
 
-        if step == 4:
+        if step == 3:
             point += self.CalHeuristicFunction(x, y)
         else:
             min_point = 10 ** 18
@@ -197,7 +199,7 @@ class Lv4:
                         visited[x][y] = 1
                         if cell != -1:
                             frontier.put((x, y))
-                        elif cell == -1 or cell == self.food:
+                        if cell == -1 or cell == self.food:
                             return True
         
         return False
@@ -206,7 +208,7 @@ class Lv4:
         
     def FindPathForPaceman(self, maze):
         if self.CheckMap(maze) == False:
-            return "END_GAME"
+            return 'END_GAME'
             
         self.time_count += 1
         ghost_list = self.FindGhost(maze)
@@ -216,9 +218,9 @@ class Lv4:
         for i in range(4):
             x, y = self.pacman[0] + self.direction[i][0], self.pacman[1] + self.direction[i][1]
             if self.See(x, y, maze) != self.wall:
-                temp_point = self.CalPointForPredictivePath(x, y, predictive_path, maze):
+                temp_point = self.CalPointForPredictivePath(x, y, predictive_path, maze, 0)
                 if min_point > temp_point:
-                    min_point = temp_point, next_step = i
+                    min_point, next_step = temp_point, i
 
         x, y = self.pacman[0] + self.direction[next_step][0], self.pacman[1] + self.direction[next_step][1]
         if 0 <= x < len(self.maze_pacman) and 0 <= y < len(self.maze_pacman[0]):
@@ -231,10 +233,10 @@ class Lv4:
         self.pacman = (x, y)
 
         if next_step == 0:
-            return "UP"
+            return 'UP'
         elif next_step == 1:
-            return "DOWN"
+            return 'DOWN'
         elif next_step == 2:
-            return "LEFT"
+            return 'LEFT'
         else:
-            return "RIGHT"
+            return 'RIGHT'
