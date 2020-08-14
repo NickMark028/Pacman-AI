@@ -106,7 +106,7 @@ class MainRun:
         self.fog = True
         
         # Pygame
-        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20))
+        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20+50))
 
     def generate_object(self,obj_img, x, y):
         self.screen.blit(obj_img, (x, y))
@@ -289,10 +289,10 @@ class MainRun:
                     if self.maze[i][j] == 1:
                         self.generate_object(self.block_img, j * 20, i * 20)
             self.generate_object(self.player_img, self.x, self.y)
-            time.sleep(0.2)
+            time.sleep(0.1)
             if t == len(cmd):
-                time.sleep(0.5)
                 pygame.display.update()
+                time.sleep(0.1)
                 break
             self.move_animation(cmd[t])
             t += 1
@@ -432,7 +432,7 @@ while running:
                 game_running = False
     pygame.display.update()'''
 
-main_loop = MainRun('Maps\\Level_4\\Map_4_3.txt', 4)
+main_loop = MainRun('Maps\\Level_1\\Map_1_3.txt', 1)
 main_loop.RunGame()
 
 
