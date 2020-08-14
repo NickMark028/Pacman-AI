@@ -103,6 +103,7 @@ class MainRun:
 
         self.score = 0
         self.level = Level
+        self.fog = True
         
         # Pygame
         self.screen = pygame.display.set_mode((self.width * 20, self.height * 20))
@@ -298,6 +299,34 @@ class MainRun:
             pygame.display.update()
     
         return
+    def Generate_Object_While_Running(self):
+        if self.fog:
+            for i in range(max(0, self.y // 20 - 4), min(self.height, self.y // 20 + 5)):
+                for j in range(max(0, self.x // 20 - 4), min(self.width, self.x // 20 + 5)):
+                    if abs(abs(i - self.y // 20) - abs(j - self.x // 20)) == 5:
+                        continue
+                    if self.maze[i][j] == 2:
+                        self.generate_object(self.food_img, j * 20, i * 20)
+                    if self.maze[i][j] == 1:
+                        self.generate_object(self.block_img, j * 20, i * 20)
+
+            for i in range(0, len(self.ghost_list)):
+                if abs(self.ghost_list[i][0] - self.y // 20) + abs(self.ghost_list[i][1] - self.x // 20) < 6 and abs(abs(self.ghost_list[i][0] - self.y // 20) - abs(self.ghost_list[i][1] - self.x // 20)) < 5:
+                    self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
+
+        else:
+            for i in range(0, self.height):
+                for j in range(0, self.width):
+                    if self.maze[i][j] == 2:
+                        self.generate_object(self.food_img, j * 20, i * 20)
+                    if self.maze[i][j] == 1:
+                        self.generate_object(self.block_img, j * 20, i * 20)
+
+            for i in range(0, len(self.ghost_list)):
+                self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
+
+        self.generate_object(self.player_img, self.x, self.y)
+        time.sleep(0.5)
 
     # game loop
     # def Level_3():
@@ -311,28 +340,17 @@ class MainRun:
         game_running = True
     
         while running:
-            self.screen.fill((0, 0, 0))
-    
-            for i in range(0, len(self.maze)):
-                for j in range(0, len(self.maze[0])):
-                    if self.maze[i][j] == 2:
-                        self.generate_object(self.food_img, j * 20, i * 20)
-    
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-    
-            for i in range(0, len(self.ghost_list)):
-                self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
-            for i in range(0, len(self.maze)):
-                for j in range(0, len(self.maze[0])):
-                    if self.maze[i][j] == 1:
-                        self.generate_object(self.block_img, j * 20, i * 20)
-            self.generate_object(self.player_img, self.x, self.y)
-            time.sleep(0.1)
+
+            self.screen.fill((0, 0, 0))
+
+            self.Generate_Object_While_Running()
     
             if not game_running:
-                time.sleep(1)
+                time.sleep(0.1)
                 print('game_over')
                 pygame.display.update()
                 break
@@ -414,7 +432,7 @@ while running:
                 game_running = False
     pygame.display.update()'''
 
-main_loop = MainRun('Maps\\Level_2\\Map_2_1.txt', 2)
+main_loop = MainRun('Maps\\Level_4\\Map_4_3.txt', 4)
 main_loop.RunGame()
 
 
