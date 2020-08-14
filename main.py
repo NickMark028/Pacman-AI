@@ -5,6 +5,7 @@ import numpy as np
 import random
 import time
 from Level4 import Lv4 
+from Level3 import Lv3
 pygame.init()
 
 
@@ -12,7 +13,7 @@ pygame.init()
 # Return (n, m, 2D_array_maze, pacman_i, pacman_j)
 def import_maze(filename):
     if (not os.path.exists(filename)):
-        return (0, 0, None)
+        return (0, 0, None, 0, 0)
 
     file = open(filename, 'r')
 
@@ -34,7 +35,7 @@ def import_maze(filename):
     return (n, m, maze, pacman_i, pacman_j)
 
 
-(n, m, maze, pacman_i, pacman_j) = import_maze('Maps\\Level_4\\Map_4_3.txt')
+(n, m, maze, pacman_i, pacman_j) = import_maze('Maps\\Level_4\\Map_4_4.txt')
 
 # create screen
 
@@ -293,13 +294,13 @@ def BFS(mtx, start, goal):
 running = True
 t = 0
 #cmd = BFS(maze, (pacman_i, pacman_j), goal)
-cmd = Lv4(maze, 1, 3, 2, (pacman_i, pacman_j))
+#cmd = Lv4(maze, 1, 3, 2, (pacman_i, pacman_j))
+cmd = Lv3(maze, (pacman_i, pacman_j), ghost_list)
 cmd_ghost = []
 game_running = True
 
 while running:
     screen.fill((0, 0, 0))
-
 
     for i in range(0, len(maze)):
         for j in range(0, len(maze[0])):
@@ -314,13 +315,14 @@ while running:
     #     print('?')
     #     sys.exit()
 
-
     for i in range(0, len(ghost_list)):
         generate_object(ghost_img_list[i % 5], ghost_list[i][1] * 20, ghost_list[i][0] * 20)
+
     for i in range(0, len(maze)):
         for j in range(0, len(maze[0])):
             if maze[i][j] == 1:
                 generate_object(block_img, j * 20, i * 20)
+
     generate_object(player_img, x, y)
     time.sleep(0.1)
     '''if t == len(cmd):
@@ -336,11 +338,14 @@ while running:
         pygame.display.update()
         break
 
-    game_running = move_animation(cmd.FindPathForPaceman(maze))
+    #game_running = move_animation(cmd.FindPathForPaceman(maze))
+    game_running = move_animation(cmd.pacman_update())
     if game_running:
-        cmd_ghost = cmd.FindPathForGhosts(maze, ghost_list)
+        #cmd_ghost = cmd.FindPathForGhosts(maze, ghost_list)
+        cmd_ghost = cmd.ghosts_update()
         for i in range(len(ghost_list)):
             ghost_list[i] = ghost_move_animation(cmd_ghost[i], ghost_list[i][0] * 20, ghost_list[i][1] * 20)
+            #ghost_list[i] = ghost_move_animation(cmd_ghost[i], ghost_list[i][0] * 20, ghost_list[i][1] * 20)
             if (y // 20, x // 20) == ghost_list[i]:
                 game_running = False
     pygame.display.update()
