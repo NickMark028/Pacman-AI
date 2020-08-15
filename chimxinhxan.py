@@ -114,7 +114,7 @@ class MainRun:
         self.level = Level
 
         # Pygame
-        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20))
+        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20 + 50))
 
     def generate_object(self, obj_img, x, y):
         self.screen.blit(obj_img, (x, y))
