@@ -294,10 +294,10 @@ class MainRun:
                     if self.maze[i][j] == 1:
                         self.generate_object(self.block_img, j * 20, i * 20)
             self.generate_object(self.player_img, self.x, self.y)
-            time.sleep(0.2)
+            time.sleep(0.1)
             if t == len(cmd):
                 pygame.display.update()
-                time.sleep(0.5)
+                time.sleep(0.1)
                 break
             self.move_animation(cmd[t])
             t += 1
@@ -306,7 +306,49 @@ class MainRun:
         return
 
     # game loop
-    # def Level_3():
+    def Level_3(self):
+        self.GenerateGhost()
+        running = True
+        cmd = Lv3(self.maze, (self.pacman_i, self.pacman_j), self.ghost_list)
+        game_running = True
+
+        while running:
+            self.screen.fill(black)
+
+            for i in range(0, len(self.maze)):
+                for j in range(0, len(self.maze[0])):
+                    if self.maze[i][j] == 2:
+                        self.generate_object(self.food_img, j * 20, i * 20)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+
+            for i in range(0, len(self.ghost_list)):
+                self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
+            for i in range(0, len(self.maze)):
+                for j in range(0, len(self.maze[0])):
+                    if self.maze[i][j] == 1:
+                        self.generate_object(self.block_img, j * 20, i * 20)
+            self.generate_object(self.player_img, self.x, self.y)
+            time.sleep(1/20)
+
+            if not game_running:
+                time.sleep(1/20)
+                print('game_over')
+                pygame.display.update()
+                break
+
+            game_running = self.move_animation(cmd.pacman_update())
+            if game_running:
+                cmd_ghost = cmd.ghosts_update()
+                for i in range(len(self.ghost_list)):
+                    self.ghost_list[i] = self.ghost_move_animation(cmd_ghost[i], self.ghost_list[i][0] * 20, self.ghost_list[i][1] * 20)
+                    if (self.y // 20, self.x // 20) == self.ghost_list[i]:
+                        game_running = False
+            pygame.display.update()
+
 
     def Level_4(self):
         self.GenerateGhost()
@@ -357,6 +399,8 @@ class MainRun:
     def RunGame(self):
         if self.level < 3:
             self.Level_1_2()
+        elif self.level == 3:
+            self.Level_3()
         elif self.level == 4:
             self.Level_4()
 
