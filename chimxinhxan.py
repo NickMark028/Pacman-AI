@@ -249,7 +249,6 @@ class MainRun:
                 temp_path.append(temp_parent)
         path = list(reversed(temp_path))
         path.append(goal)
-        print(path)
         movement = []
         for i in range(0, len(path) - 1):
             if (path[i][0] - 1, path[i][1]) == (path[i + 1][0], path[i + 1][1]):
