@@ -61,11 +61,11 @@ class Pacman:
         if (len(self.path) == 0):
 
             # Attempt to explore unexplored area
-            self.path = self.explore(self.unexplored_node, False)
+            self.path = self.explore(self.unexplored_node)
             if (len(self.path) == 0):
 
                 # The map is explored completely, now search for food outside of range
-                self.path = self.explore(self.food_set, True)
+                self.path = self.explore(self.food_set)
 
                 # No food left
                 if len(self.path) == 0:
@@ -168,7 +168,7 @@ class Pacman:
         return path
 
     # Explore unexplored area
-    def explore(self, goal_set, is_food):
+    def explore(self, goal_set):
         # No food left in the maze
         if len(self.food_set) == 0: return []
 
@@ -224,7 +224,7 @@ class Ghost:
 
     def move_random(self):
         if self.current_direction is None:
-            direction = random.choice(self.next_direction_list)
+            direction = random.choice(  self.next_direction_list)
             self.current_direction = direction[2]
             return self.current_direction
         else:
