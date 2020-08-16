@@ -160,8 +160,6 @@ class Pacman:
         path = deque()
         current = parent[goal[0]][goal[1]]  # ((row, column), direction)
 
-        #print(current, '-', start)
-
         while (current[0] != start):
             path.append(current[1])
             current = parent[current[0][0]][current[0][1]]

@@ -6,9 +6,25 @@ import random
 import time
 from Level4 import Lv4
 from Level3 import Lv3
+from pygame.locals import *
 
 pygame.init()
+score_show = pygame.font.Font('crackman.ttf', 65)
+score_font = pygame.font.Font('crackman.ttf', 30)
+menu_font = pygame.font.Font('crackman.ttf', 55)
+GO_font = pygame.font.Font('crackman.ttf', 120)
+scr_width = 800
+scr_height = 600
+mainClock = pygame.time.Clock()
 
+#Color
+black = (0,0,0)
+white = (255,255,255)
+red = (255,0,0)
+lemon = (239, 253, 95)
+green = (0,255,0)
+blue = (0,0,255)
+red_ferrari = (255,40,0)
 
 # Import a maze from file name
 # Return (n, m, 2D_array_maze, pacman_i, pacman_j)
@@ -36,32 +52,33 @@ def import_maze(filename):
     return (n, m, maze, pacman_i, pacman_j)
 
 
-
-# create screen
-
-
-# change tilte and logo
-
+# Create screen and logo, title
+global screen
+screen = pygame.display.set_mode((scr_width, scr_height), 0 )
 pygame.display.set_caption("Pacman")
 logo = pygame.image.load('pacmanicon.png')
 pygame.display.set_icon(logo)
 
+# Additional functions
+def menu_config():
+    # change tilte and logo
+    pygame.display.set_caption("Pacman")
+    logo = pygame.image.load('pacmanicon.png')
+    pygame.display.set_icon(logo)
 
-# create object
+    menu_img = pygame.image.load('pacman_background.png')
+    screen.blit(menu_img, (0, 0))
+
+def draw_text(text, font, color, surface, x, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x,y)
+    surface.blit(textobj, textrect)
 
 
-
-
-# pacman player
-
-
-# generate food
-
-
-# generate ghost
-
-
-# wall block
+def show_score(score_val, x, y):
+    score = score_font.render("Score: " + str(score_val), True, lemon)
+    screen.blit(score, (x, y))
 
 
 class MainRun:
@@ -103,14 +120,13 @@ class MainRun:
 
         self.score = 0
         self.level = Level
-        self.fog = True
-        
-        # Pygame
-        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20+50))
 
-    def generate_object(self,obj_img, x, y):
+        # Pygame
+        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20))
+
+    def generate_object(self, obj_img, x, y):
         self.screen.blit(obj_img, (x, y))
-    
+
     def GenerateGhost(self):
         for i in range(0, self.height):
             for j in range(0, self.width):
@@ -181,43 +197,41 @@ class MainRun:
             else:
                 self.score -= 1
                 self.player_img = self.player_img270
-        
-        return True
 
+        return True
 
     def ghost_move_animation(self, command, y_ghost, x_ghost):
         # time.sleep(0.5)
         if command == 'LEFT' and self.maze[y_ghost // 20][(x_ghost - 20) // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             x_ghost -= 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
         if command == 'RIGHT' and self.maze[y_ghost // 20][(x_ghost + 20) // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             x_ghost += 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
         if command == 'UP' and self.maze[(y_ghost - 20) // 20][x_ghost // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             y_ghost -= 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
         if command == 'DOWN' and self.maze[(y_ghost + 20) // 20][x_ghost // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             y_ghost += 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
-    
-        return (y_ghost // 20, x_ghost // 20)
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
 
+        return (y_ghost // 20, x_ghost // 20)
 
     def BFS_for_lv1_2(self, start, goal):
         frontier = [start]
         expanded = []
         parent_list = []
         flag = np.zeros((self.height, self.width))
-    
+
         while (frontier[0] != goal):
             node = frontier.pop(0)
             flag[node[0]][node[1]] = 1
             expanded.append(node)
-    
+
             if (flag[node[0] - 1][node[1]] != 1 and (node[0] - 1, node[1]) not in frontier and self.maze[node[0] - 1][
                 node[1]] != 1 and self.maze[node[0] - 1][node[1]] != 3):
                 parent_list.append(((node[0] - 1, node[1]), node))
@@ -254,34 +268,72 @@ class MainRun:
                 movement.append('LEFT')
             if (path[i][0], path[i][1] + 1) == (path[i + 1][0], path[i + 1][1]):
                 movement.append('RIGHT')
-    
-        return movement
 
+        return movement
 
     def Level_1_2(self):
         self.GenerateGhost()
         running = True
+        state = 'lose'
         t = 0
         goal = (1, 2)
         for q in self.food_list:
             goal = q
         cmd = self.BFS_for_lv1_2((self.pacman_i, self.pacman_j), goal)
         while running:
-            self.screen.fill((0, 0, 0))
-    
+            self.screen.fill(black)
+
             for i in range(0, len(self.maze)):
                 for j in range(0, len(self.maze[0])):
                     if self.maze[i][j] == 2:
                         self.generate_object(self.food_img, j * 20, i * 20)
-    
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            #     keys = pygame.key.get_pressed()
-            # if t == len(cmd):
-            #     print('?')
-            #     sys.exit()
-    
+
+            for i in range(0, len(self.ghost_list)):
+                self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
+            for i in range(0, len(self.maze)):
+                for j in range(0, len(self.maze[0])):
+                    if self.maze[i][j] == 1:
+                        self.generate_object(self.block_img, j * 20, i * 20)
+            self.generate_object(self.player_img, self.x, self.y)
+
+            show_score(self.score, self.width * 20 + 5, self.height * 20 + 35)
+
+            time.sleep(0.2)
+            if t == len(cmd):
+                pygame.display.update()
+                time.sleep(0.5)
+                state = 'win'
+                break
+            self.move_animation(cmd[t])
+            t += 1
+            pygame.display.update()
+
+        return state, self.score
+
+    # game loop
+    def Level_3(self):
+        self.GenerateGhost()
+        running = True
+        cmd = Lv3(self.maze, (self.pacman_i, self.pacman_j), self.ghost_list)
+        game_running = True
+        state = 'win'
+
+        while running:
+            self.screen.fill(black)
+
+            for i in range(0, len(self.maze)):
+                for j in range(0, len(self.maze[0])):
+                    if self.maze[i][j] == 2:
+                        self.generate_object(self.food_img, j * 20, i * 20)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
             for i in range(0, len(self.ghost_list)):
                 self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
             for i in range(0, len(self.maze)):
@@ -290,149 +342,305 @@ class MainRun:
                         self.generate_object(self.block_img, j * 20, i * 20)
             self.generate_object(self.player_img, self.x, self.y)
             time.sleep(0.1)
-            if t == len(cmd):
-                pygame.display.update()
+
+            if not game_running:
                 time.sleep(0.1)
+                state = 'lose'
+                print('game_over')
+                pygame.display.update()
                 break
-            self.move_animation(cmd[t])
-            t += 1
+
+            game_running = self.move_animation(cmd.pacman_update())
+            if game_running:
+                cmd_ghost = cmd.ghosts_update()
+                for i in range(len(self.ghost_list)):
+                    self.ghost_list[i] = self.ghost_move_animation(cmd_ghost[i], self.ghost_list[i][0] * 20,
+                                                                   self.ghost_list[i][1] * 20)
+                    if (self.y // 20, self.x // 20) == self.ghost_list[i]:
+                        game_running = False
+                for i in self.ghost_list:
+                    self.maze[i[0]][i[1]] = 3
             pygame.display.update()
-    
-        return
-    def Generate_Object_While_Running(self):
-        if self.fog:
-            for i in range(max(0, self.y // 20 - 4), min(self.height, self.y // 20 + 5)):
-                for j in range(max(0, self.x // 20 - 4), min(self.width, self.x // 20 + 5)):
-                    if abs(abs(i - self.y // 20) - abs(j - self.x // 20)) == 5:
-                        continue
-                    if self.maze[i][j] == 2:
-                        self.generate_object(self.food_img, j * 20, i * 20)
-                    if self.maze[i][j] == 1:
-                        self.generate_object(self.block_img, j * 20, i * 20)
-
-            for i in range(0, len(self.ghost_list)):
-                if abs(self.ghost_list[i][0] - self.y // 20) + abs(self.ghost_list[i][1] - self.x // 20) < 6 and abs(abs(self.ghost_list[i][0] - self.y // 20) - abs(self.ghost_list[i][1] - self.x // 20)) < 5:
-                    self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
-
-        else:
-            for i in range(0, self.height):
-                for j in range(0, self.width):
-                    if self.maze[i][j] == 2:
-                        self.generate_object(self.food_img, j * 20, i * 20)
-                    if self.maze[i][j] == 1:
-                        self.generate_object(self.block_img, j * 20, i * 20)
-
-            for i in range(0, len(self.ghost_list)):
-                self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
-
-        self.generate_object(self.player_img, self.x, self.y)
-        time.sleep(0.5)
-
-    # game loop
-    # def Level_3():
-
+        return state, self.score
 
     def Level_4(self):
         self.GenerateGhost()
+        state = 'win'
         running = True
         cmd = Lv4(self.maze, 1, 3, 2, (self.pacman_i, self.pacman_j))
         cmd_ghost = []
         game_running = True
-    
+
         while running:
+            self.screen.fill(black)
+
+            for i in range(0, len(self.maze)):
+                for j in range(0, len(self.maze[0])):
+                    if self.maze[i][j] == 2:
+                        self.generate_object(self.food_img, j * 20, i * 20)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
 
-            self.screen.fill((0, 0, 0))
+            for i in range(0, len(self.ghost_list)):
+                self.generate_object(self.ghost_img_list[i % 5], self.ghost_list[i][1] * 20, self.ghost_list[i][0] * 20)
+            for i in range(0, len(self.maze)):
+                for j in range(0, len(self.maze[0])):
+                    if self.maze[i][j] == 1:
+                        self.generate_object(self.block_img, j * 20, i * 20)
+            self.generate_object(self.player_img, self.x, self.y)
+            time.sleep(0.1)
 
-            self.Generate_Object_While_Running()
-    
             if not game_running:
-                time.sleep(0.1)
+                time.sleep(1)
+                state = 'lose'
                 print('game_over')
                 pygame.display.update()
                 break
-    
+
             game_running = self.move_animation(cmd.FindPathForPaceman(self.maze))
             if game_running:
                 cmd_ghost = cmd.FindPathForGhosts(self.maze, self.ghost_list)
                 for i in range(len(self.ghost_list)):
-                    self.ghost_list[i] = self.ghost_move_animation(cmd_ghost[i], self.ghost_list[i][0] * 20, self.ghost_list[i][1] * 20)
+                    self.ghost_list[i] = self.ghost_move_animation(cmd_ghost[i], self.ghost_list[i][0] * 20,
+                                                                   self.ghost_list[i][1] * 20)
                     if (self.y // 20, self.x // 20) == self.ghost_list[i]:
                         game_running = False
+                for i in self.ghost_list:
+                    self.maze[i[0]][i[1]] = 3
             pygame.display.update()
-    
-        return
+
+        return state, self.score
 
     def RunGame(self):
-        if self.level < 3:
-            self.Level_1_2()
+        if self.level == 1 or self.level == 2:
+            state, scr = self.Level_1_2()
+        elif self.level == 3:
+            state, scr = self.Level_3()
         elif self.level == 4:
-            self.Level_4()
+            state, scr = self.Level_4()
+        return state, scr
+
+click = False
+
+def main_menu():
+    while True:
+        screen.fill(black)
+        menu_config()
+
+        play_button = pygame.Rect(315, 405, 170, 55)
+        exit_button = pygame.Rect(235, 515, 350, 55)
+
+        pygame.draw.rect(screen, black, play_button)
+        pygame.draw.rect(screen, black, exit_button)
+
+        draw_text("Play", menu_font, blue, screen, 340, 400)
+        draw_text("Quit", menu_font, blue, screen, 335, 510)
+
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        mx, my = pygame.mouse.get_pos()
+        if play_button.collidepoint((mx, my)):
+            if click:
+                lvl_selection_menu()
+        if exit_button.collidepoint((mx, my)):
+            if click:
+                pygame.quit()
+                sys.exit()
+
+        pygame.display.update()
+        mainClock.tick(60)
+
+def lvl_selection_menu():
+    lvl_run = True
+    game_over = True
+    while lvl_run:
+        screen.fill(black)
+        menu_config()
+
+        level_1 = pygame.Rect(90, 360, 230, 50)
+        level_2 = pygame.Rect(490, 360, 230, 50)
+        level_3 = pygame.Rect(90, 445, 230, 50)
+        level_4 = pygame.Rect(490, 445, 230, 50)
+        exit_button = pygame.Rect(315, 520, 170, 50)
+
+        pygame.draw.rect(screen, black, level_1)
+        pygame.draw.rect(screen, black, level_2)
+        pygame.draw.rect(screen, black, level_3)
+        pygame.draw.rect(screen, black, level_4)
+        pygame.draw.rect(screen, black, exit_button)
+
+        draw_text("Level 1", menu_font, red_ferrari, screen, 100, 350)
+        draw_text("Level 2", menu_font, red_ferrari, screen, 500, 350)
+        draw_text("Level 3", menu_font, red_ferrari, screen, 100, 435)
+        draw_text("Level 4", menu_font, red_ferrari, screen, 500, 435)
+        draw_text("Back", menu_font, blue, screen, 340, 510)
+
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        mx, my = pygame.mouse.get_pos()
+        if level_1.collidepoint((mx, my)):
+            if click:
+                path = 'Maps\\Level_1\\Map_1_'
+                map_selection_menu(path, 1)
+        if level_2.collidepoint((mx, my)):
+            if click:
+                path = 'Maps\\Level_2\\Map_2_'
+                map_selection_menu(path, 2)
+        if level_3.collidepoint((mx, my)):
+            if click:
+                path = 'Maps\\Level_3\\Map_3_'
+                map_selection_menu(path, 3)
+        if level_4.collidepoint((mx, my)):
+            if click:
+                path = 'Maps\\Level_4\\Map_4_'
+                map_selection_menu(path, 4)
+        if exit_button.collidepoint((mx, my)):
+            if click:
+                lvl_run = False
+
+        pygame.display.update()
+        mainClock.tick(60)
+
+def map_selection_menu(path, level):
+    map_run = True
+    global state
+    screen = pygame.display.set_mode((scr_width, scr_height), 0)
+    while map_run:
+        screen.fill(black)
+        menu_config()
+
+        map_1 = pygame.Rect(75, 350, 180, 55)
+        map_2 = pygame.Rect(550, 350, 180, 55)
+        map_3 = pygame.Rect(75, 435, 180, 55)
+        map_4 = pygame.Rect(550, 435, 180, 55)
+        map_5 = pygame.Rect(315, 400, 180, 55)
+        exit_button = pygame.Rect(315, 510, 170, 55)
+
+        pygame.draw.rect(screen, black, map_1)
+        pygame.draw.rect(screen, black, map_2)
+        pygame.draw.rect(screen, black, map_3)
+        pygame.draw.rect(screen, black, map_4)
+        pygame.draw.rect(screen, black, map_5)
+        pygame.draw.rect(screen, black, exit_button)
+
+        draw_text("Map 1", menu_font, red_ferrari, screen, 85, 350)
+        draw_text("Map 2", menu_font, red_ferrari, screen, 565, 350)
+        draw_text("Map 3", menu_font, red_ferrari, screen, 85, 435)
+        draw_text("Map 4", menu_font, red_ferrari, screen, 565, 435)
+        draw_text("Map 5", menu_font, red_ferrari, screen, 335, 400)
+        draw_text("Back", menu_font, blue, screen, 340, 510)
+
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            # if event.type == KEYDOWN:
+            #     if event.key == K_ESCAPE:
+            #         map_run = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        mx, my = pygame.mouse.get_pos()
+        if map_1.collidepoint((mx, my)):
+            if click:
+                path += '1.txt'
+                game_run(path, level)
+
+        if map_2.collidepoint((mx, my)):
+            if click:
+                path += '2.txt'
+                game_run(path, level)
+        if map_3.collidepoint((mx, my)):
+            if click:
+                path += '3.txt'
+                game_run(path, level)
+        if map_4.collidepoint((mx, my)):
+            if click:
+                path += '4.txt'
+                game_run(path, level)
+        if map_5.collidepoint((mx, my)):
+            if click:
+                path += '5.txt'
+                game_run(path, level)
+        if exit_button.collidepoint((mx, my)):
+            if click:
+                map_run = False
 
 
-'''running = True
-t = 0
-# cmd = BFS(maze, (pacman_i, pacman_j), goal)
-# cmd = Lv4(maze, 1, 3, 2, (pacman_i, pacman_j))
-cmd = Lv3(maze, (pacman_i, pacman_j), ghost_list)
-cmd_ghost = []
-game_running = True
+        pygame.display.update()
+        mainClock.tick(60)
 
-while running:
-    screen.fill((0, 0, 0))
+def game_over(path, level, score):
+    waiting = True
+    screen = pygame.display.set_mode((scr_width, scr_height), 0)
 
-    for i in range(0, len(maze)):
-        for j in range(0, len(maze[0])):
-            if maze[i][j] == 2:
-                generate_object(food_img, j * 20, i * 20)
+    while waiting:
+        screen.fill(black)
+        play_again = pygame.Rect(60, 370, 350, 60)
+        quit = pygame.Rect(575, 370, 150, 60)
+        pygame.draw.rect(screen, black, play_again)
+        pygame.draw.rect(screen, black, quit)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        draw_text("Game over!", GO_font, red_ferrari, screen, 40, 75)
+        draw_text("Score: " + str(score), score_show, lemon, screen, 220, 250)
+        draw_text("Play again", menu_font, blue, screen, 70, 370)
+        draw_text("Back", menu_font, blue, screen, 580, 370)
+
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        mx, my = pygame.mouse.get_pos()
+        if play_again.collidepoint((mx, my)):
+            if click:
+                game_run(path, level)
+                waiting = False
+        if quit.collidepoint((mx,my)):
+            if click:
+                waiting = False
+                main_menu()
+        pygame.display.update()
+        mainClock.tick(60)
+
+def game_run(path, level):
+    running = True
+
+    main_loop = MainRun(path, level)
+    state, scr = main_loop.RunGame()
+    while running:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        if state == 'win' or state == 'lose':
+            game_over(path, level, scr)
             running = False
-    #     keys = pygame.key.get_pressed()
-    # if t == len(cmd):
-    #     print('?')
-    #     sys.exit()
 
-    for i in range(0, len(ghost_list)):
-        generate_object(ghost_img_list[i % 5], ghost_list[i][1] * 20, ghost_list[i][0] * 20)
-
-    for i in range(0, len(maze)):
-        for j in range(0, len(maze[0])):
-            if maze[i][j] == 1:
-                generate_object(block_img, j * 20, i * 20)
-
-    generate_object(player_img, x, y)
-    time.sleep(0.1)
-    if t == len(cmd):
-        time.sleep(0.5)
-        pygame.display.update()
-        break
-    move_animation(cmd[t])
-    t += 1
-
-    if not game_running:
-        time.sleep(1)
-        print('game_over')
-        pygame.display.update()
-        break
-
-    # game_running = move_animation(cmd.FindPathForPaceman(maze))
-    game_running = move_animation(cmd.pacman_update())
-    if game_running:
-        # cmd_ghost = cmd.FindPathForGhosts(maze, ghost_list)
-        cmd_ghost = cmd.ghosts_update()
-        for i in range(len(ghost_list)):
-            ghost_list[i] = ghost_move_animation(cmd_ghost[i], ghost_list[i][0] * 20, ghost_list[i][1] * 20)
-            # ghost_list[i] = ghost_move_animation(cmd_ghost[i], ghost_list[i][0] * 20, ghost_list[i][1] * 20)
-            if (y // 20, x // 20) == ghost_list[i]:
-                game_running = False
-    pygame.display.update()'''
-
-main_loop = MainRun('Maps\\Level_1\\Map_1_3.txt', 1)
-main_loop.RunGame()
-
-
+main_menu()
