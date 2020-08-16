@@ -135,7 +135,7 @@ class Lv4:
         if distance_explored == 10 ** 15:
             distance_explored = 0
         
-        return int(self.point_for_food * distance_food + self.point_for_exploring * distance_explored + self.maze_time[x][y])
+        return int(self.point_for_food * distance_food + self.point_for_exploring * distance_explored) #+ self.maze_time[x][y]
 
     def PredictPathofGhost(self, ghost_list, maze):
         possible_way = [ghost_list]
@@ -217,7 +217,7 @@ class Lv4:
         for i in range(4):
             x, y = self.pacman[0] + self.direction[i][0], self.pacman[1] + self.direction[i][1]
             if self.See(x, y, maze) != self.wall:
-                temp_point = self.CalPointForPredictivePath(x, y, predictive_path, maze, 0)
+                temp_point = self.CalPointForPredictivePath(x, y, predictive_path, maze, 0) + self.maze_time[x][y]
                 if min_point > temp_point:
                     min_point, next_step = temp_point, i
 
