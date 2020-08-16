@@ -205,19 +205,19 @@ class MainRun:
         if command == 'LEFT' and self.maze[y_ghost // 20][(x_ghost - 20) // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             x_ghost -= 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
         if command == 'RIGHT' and self.maze[y_ghost // 20][(x_ghost + 20) // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             x_ghost += 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
         if command == 'UP' and self.maze[(y_ghost - 20) // 20][x_ghost // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             y_ghost -= 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
         if command == 'DOWN' and self.maze[(y_ghost + 20) // 20][x_ghost // 20] != 1:
             self.maze[y_ghost // 20][x_ghost // 20] = 2 if (y_ghost // 20, x_ghost // 20) in self.food_list else 0
             y_ghost += 20
-            self.maze[y_ghost // 20][x_ghost // 20] = 3
+            #self.maze[y_ghost // 20][x_ghost // 20] = 3
 
         return (y_ghost // 20, x_ghost // 20)
 
@@ -358,6 +358,8 @@ class MainRun:
                                                                    self.ghost_list[i][1] * 20)
                     if (self.y // 20, self.x // 20) == self.ghost_list[i]:
                         game_running = False
+                for i in self.ghost_list:
+                    self.maze[i[0]][i[1]] = 3
             pygame.display.update()
         return state, self.score
 
@@ -405,6 +407,8 @@ class MainRun:
                                                                    self.ghost_list[i][1] * 20)
                     if (self.y // 20, self.x // 20) == self.ghost_list[i]:
                         game_running = False
+                for i in self.ghost_list:
+                    self.maze[i[0]][i[1]] = 3
             pygame.display.update()
 
         return state, self.score

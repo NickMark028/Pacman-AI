@@ -100,7 +100,7 @@ class Lv4:
             
             if not count[0]:
                 depth += 1
-                count[0] += count[1]
+                count[0] = count[1]
                 count[1] = 0
 
         return ghost_list
@@ -209,7 +209,6 @@ class Lv4:
     def FindPathForPaceman(self, maze):
         if self.CheckMap(maze) == False:
             return 'END_GAME'
-            
         self.time_count += 1
         ghost_list = self.FindGhost(maze)
         predictive_path = self.PredictPathofGhost(ghost_list, maze)
