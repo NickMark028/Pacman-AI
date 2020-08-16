@@ -32,10 +32,8 @@ class Pacman:
 
     def get_position(self):
         return (self.position[0], self.position[1])
-
     def get_at(self, matrix, position):
         return matrix[position[0]][position[1]]
-
     def set_at(self, matrix, position, value):
         matrix[position[0]][position[1]] = value
 
@@ -61,26 +59,28 @@ class Pacman:
         if (len(self.path) == 0):
 
             # Attempt to explore unexplored area
-            self.path = self.explore(self.unexplored_node)
+            self.path = self.explore(position_tuple, self.unexplored_node)
             if (len(self.path) == 0):
 
                 # The map is explored completely, now search for food outside of range
-                self.path = self.explore(self.food_set)
+                self.path = self.explore(position_tuple, self.food_set)
 
                 # No food left
                 if len(self.path) == 0:
-                    return 'game_over'
+                    return 'END_GAME'
 
         # Move the pacman
         return self.continue_last_path()
 
     # Continue to move the last path
     def continue_last_path(self):
-        direction = DIRECTION_MOVEMENT_LIST[self.path[0]]
+        next_move = self.path.popleft()
+
+        direction = DIRECTION_MOVEMENT_LIST[next_move]
         self.position[0] += direction[0]
         self.position[1] += direction[1]
 
-        return self.path.popleft()
+        return next_move
 
     # Scan for near by ghosts and mark unexplored area outside of range
     def scan(self, current_position, depth_limit):
@@ -101,7 +101,7 @@ class Pacman:
             if self.is_inside_map(neighboor):
                 self.scan(neighboor, depth_limit - 1)
 
-    # Check food & ghost at a position
+    # Check food & ghost and current position
     def check_food(self, food_position):
         if (self.get_at(self.maze, food_position) == POINT_ID and\
             self.get_at(self.mask, food_position) == UNEXPLORED):
@@ -132,7 +132,7 @@ class Pacman:
         if self.get_at(self.maze, current_position) == POINT_ID:
             return True
 
-        if depth_limit == 0: return None
+        if depth_limit == 0: return False
 
         visited_set.add(current_position)
 
@@ -159,23 +159,25 @@ class Pacman:
     def get_path(self, parent, start, goal):
         path = deque()
         current = parent[goal[0]][goal[1]]  # ((row, column), direction)
-        path.append(current[1])
+
+        #print(current, '-', start)
 
         while (current[0] != start):
             path.append(current[1])
             current = parent[current[0][0]][current[0][1]]
+
         path.reverse()
+
         return path
 
     # Explore unexplored area
-    def explore(self, goal_set):
+    def explore(self, start, goal_set):
         # No food left in the maze
         if len(self.food_set) == 0: return []
 
         # Initialize variables
         marked = [[False for _ in range(len(self.maze[0]))] for _ in range(len(self.maze))]
         parent = [[None for _ in range(len(self.maze[0]))] for _ in range(len(self.maze))]  # [((row, column), direction), ...]
-        start = self.get_position()         # (row, column)
         self.set_at(marked, start, True)
         frontier = deque()
         frontier.append(start)
