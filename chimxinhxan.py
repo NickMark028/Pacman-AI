@@ -122,7 +122,7 @@ class MainRun:
         self.level = Level
 
         # Pygame
-        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20 + 50))
+        self.screen = pygame.display.set_mode((self.width * 20, self.height * 20))
 
     def generate_object(self, obj_img, x, y):
         self.screen.blit(obj_img, (x, y))
@@ -621,7 +621,7 @@ def game_over(path, level, score):
         if quit.collidepoint((mx,my)):
             if click:
                 waiting = False
-
+                main_menu()
         pygame.display.update()
         mainClock.tick(60)
 
